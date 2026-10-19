@@ -1,0 +1,58 @@
+
+#include <Servo.h>
+
+Servo myServo;
+
+const int trigPin = 5;
+const int echoPin = 6;
+const int servoPin = 9;
+
+long duration;
+float distance;
+
+void setup() {
+  Serial.begin(9600);
+
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
+  myServo.attach(servoPin);
+  myServo.write(0);
+
+  Serial.println("Ultrasonic and Servo Test");
+}
+
+void loop() {
+  // Send ultrasonic pulse
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // Read the echo
+  duration = pulseIn(echoPin, HIGH, 30000);
+
+  if (duration == 0) {
+    Serial.println("No object detected");
+    myServo.write(0);
+  } else {
+    // Convert echo time to distance in centimeters
+    distance = duration * 0.0343 / 2;
+
+    Serial.print("Distance: ");
+    Serial.print(distance);
+    Serial.println(" cm");
+
+    if (distance <= 15) {
+      myServo.write(180);
+      Serial.println("Object detected! Servo at 180 degrees");
+    } else {
+      myServo.write(0);
+      Serial.println("Area clear! Servo at 0 degrees");
+    }
+  }
+
+  delay(200);
+}
